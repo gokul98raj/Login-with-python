@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, url_for
+from flask import Flask, flash, redirect, request, render_template, url_for
 import pymysql
 import boto3
 
@@ -13,10 +13,10 @@ def get_db_connection():
     db_host = ssm_client.get_parameter(Name='/myapp/db_endpoint', WithDecryption=True)['Parameter']['Value']
     db_user = ssm_client.get_parameter(Name='/myapp/db_user', WithDecryption=True)['Parameter']['Value']
     db_password = ssm_client.get_parameter(Name='/myapp/db_password', WithDecryption=True)['Parameter']['Value']
-    #db_name = ssm_client.get_parameter(Name='/your/parameter/store/db_name', WithDecryption=True)['Parameter']['Value']
+    db_name = ssm_client.get_parameter(Name='/myapp/db_name', WithDecryption=True)['Parameter']['Value']
 
-    #return pymysql.connect(host=db_host, user=db_user, password=db_password, db=db_name)
-    return pymysql.connect(host=db_host, user=db_user, password=db_password)
+    return pymysql.connect(host=db_host, user=db_user, password=db_password, db=db_name)
+    #return pymysql.connect(host=db_host, user=db_user, password=db_password)
 
 @app.route('/')
 def home():
@@ -68,7 +68,6 @@ def register():
     
     return render_template('register.html')
 
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
-    #app.run(debug=True)
+    #app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)
