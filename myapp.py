@@ -1,19 +1,26 @@
 from flask import Flask, flash, redirect, request, render_template, url_for
 import pymysql
 import boto3
-import os
-
-#app_region = os.environ.get('APP_REGION')
-#iam_role = os.environ.get('APP_IAM_ROLE')
+import requests
 
 app = Flask(__name__)
 
+import requests
+
+def get_aws_region():
+    metadata_url = "http://169.254.169.254/latest/dynamic/instance-identity/document"
+    response = requests.get(metadata_url)
+    metadata = response.json()
+    return metadata['region']
+
+# Get the AWS region
+region = get_aws_region()
+
+
 def get_db_connection():
     # Initialize AWS SDK
-    #session = boto3.session.Session(profile_name=iam_role)
-    #ssm_client = session.client('ssm', region_name=app_region)
-
-    ssm_client = boto3.client('ssm')
+    session = boto3.session.Session()
+    ssm_client = session.client('ssm', region_name=region)
 
     # Fetch database details from Parameter Store
     db_host = ssm_client.get_parameter(Name='/myapp/db_endpoint', WithDecryption=True)['Parameter']['Value']
@@ -96,5 +103,4 @@ def register():
     return render_template('register.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
-    #app.run(debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)
