@@ -18,6 +18,27 @@ def get_db_connection():
     return pymysql.connect(host=db_host, user=db_user, password=db_password, db=db_name)
     #return pymysql.connect(host=db_host, user=db_user, password=db_password)
 
+def create_table():
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    # Create a 'users' table if it doesn't exist
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(50) NOT NULL,
+        password VARCHAR(50) NOT NULL
+    )
+    """
+    cursor.execute(create_table_query)
+
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+# Call create_table() when the application starts
+create_table()
+
 @app.route('/')
 def home():
     #return 'Welcome to the home page!'
