@@ -1,13 +1,19 @@
 from flask import Flask, flash, redirect, request, render_template, url_for
 import pymysql
 import boto3
+import os
+
+#app_region = os.environ.get('APP_REGION')
+#iam_role = os.environ.get('APP_IAM_ROLE')
 
 app = Flask(__name__)
 
 def get_db_connection():
     # Initialize AWS SDK
-    session = boto3.session.Session()
-    ssm_client = session.client('ssm')
+    #session = boto3.session.Session(profile_name=iam_role)
+    #ssm_client = session.client('ssm', region_name=app_region)
+
+    ssm_client = boto3.client('ssm')
 
     # Fetch database details from Parameter Store
     db_host = ssm_client.get_parameter(Name='/myapp/db_endpoint', WithDecryption=True)['Parameter']['Value']
